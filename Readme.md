@@ -1,86 +1,56 @@
-#  AI TraceFinder — Forensic Scanner Identification  
+# Multi-Scale Tampering Maps Dataset
 
-##  Overview  
-AI TraceFinder is a forensic machine learning platform that identifies the **source scanner device** used to digitize a document or image. Each scanner (brand/model) introduces unique **noise, texture, and compression artifacts** that serve as a fingerprint. By analyzing these patterns, AI TraceFinder enables **fraud detection, authentication, and forensic validation** in scanned documents.  
+Contact: **Paweł Korus**, Shenzhen University and AGH University of Science and Technology
+E-mail: pkorus [at] agh [dot] edu [dot] pl
+Web: http://kt.agh.edu.pl/~korus
+Github: https://github.com/pkorus/multiscale-prnu
 
----
+## Description
 
-##  Goals & Objectives  
-- Collect and label scanned document datasets from multiple scanners  
-- Robust preprocessing (resize, grayscale, normalize, denoise)  
-- Extract scanner-specific features (noise, FFT, PRNU, texture descriptors)  
-- Train classification models (ML + CNN)  
-- Apply explainability tools (Grad-CAM, SHAP)  
-- **Deploy an interactive app for scanner source identification**  
-- Deliver **accurate, interpretable results** for forensic and legal use cases  
+This dataset contains multi-scale tampering probability maps obtained by running a standard sliding-window PRNU detector (with central-pixel attribution) on a set of 136 tampered images. The images represent realistic forgeries, created by hand in modern photo-editing software (GIMP and Affinity Photo). The images were captured by four different cameras: Sony alpha57 (own dataset), Canon 60D (courtesy of dr Bin Li), Nikon D7000, Nikon D90 (RAISE dataset http://mmlab.disi.unitn.it/RAISE/).
 
----
+The dataset is intended for testing multi-scale fusion algorithms. Each forgery case has the following data:
+- seven 240 x 135 px multi-scale tampering probability maps (stored in `.mat` files)
+- 480 x 270 px ground truth tampering map (`_mask.png` files)
+- 480 x 270 px RGB thumbnail of the tampered image (`.tif` files)
 
-##  Methodology 
-1. **Data Collection & Labeling**  
-   - Gather scans from 3–5 scanner models/brands  
-   - Create a structured, labeled dataset  
+A preview of an example forgery is shown below.
 
-2. **Preprocessing**  
-   - Resize, grayscale, normalize  
-   - Optional: denoise to highlight artifacts  
+![Example forgery](./preview.png)
 
-3. **Feature Extraction**  
-   - PRNU patterns, FFT, texture descriptors (LBP, edge features)  
+**Notes:**
 
-4. **Model Training**  
-   - Baseline ML: SVM, Random Forest, Logistic Regression  
-   - Deep Learning: CNN with augmentation  
+- In order to minimize the size of the dataset, the tampering probability maps are stored with `uint16` precision. Use Matlab's function `im2double` to obtain floating-point numbers in range [0,1].
 
-5. **Evaluation & Explainability**  
-   - Metrics: Accuracy, F1-score, Confusion Matrix  
-   - Interpretability: Grad-CAM, SHAP feature maps  
+- The thumbnails can be used to guide the localization / fusion schemes. Full scale images (1920 x 1080 px) are available as a separate dataset (see http://kt.agh.edu.pl/~korus/downloads/dataset-realistic-tampering/).
 
-6. **Deployment**  
-   - Streamlit app → upload scanned image → predict scanner model  
-   - Display confidence score and key feature regions  
+## Using the Dataset
 
----
+The dataset comes from our paper *"Multi-scale Analysis Strategies in PRNU-based Tampering Localization"* and can be used only for educational and research purposes. If you use it in your research, please cite the following paper:
 
-##  Actionable Insights for Forensics  
-- **Source Attribution:** Identify which scanner created a scanned copy of a document.  
-- **Fraud Detection:** Detect forgeries where unauthorized scanners were used.  
-- **Legal Verification:** Validate whether scanned evidence originated from approved devices.  
-- **Tamper Resistance:** Differentiate between authentic vs. tampered scans.  
-- **Explainability:** Provide visual evidence of how classification was made.  
+- P. Korus & J. Huang, Multi-scale Analysis Strategies in PRNU-based Tampering Localization, IEEE Trans. Information Forensics & Security, 2017
 
----
+For Bibtex users:
 
-##  Architecture (Conceptual)  
-Input ➜ Preprocessing ➜ Feature Extraction + Modeling ➜ Evaluation & Explainability ➜ Prediction App  
-
----
-
-## ⏳ 8-Week Roadmap (Milestones)  
-- **W1:** Dataset collection (min. 3–5 scanners), labeling, metadata analysis  
-- **W2:** Preprocessing pipeline (resize, grayscale, normalize, optional denoise)  
-- **W3:** Feature extraction (noise maps, FFT, LBP, texture descriptors)  
-- **W4:** Baseline ML models (SVM, RF, Logistic Regression) + evaluation  
-- **W5:** CNN model training with augmentation, hyperparameter tuning  
-- **W6:** Model evaluation (accuracy, F1, confusion matrix) + Grad-CAM/SHAP analysis  
-- **W7:** Streamlit app development → image upload, prediction, confidence output  
-- **W8:** Final documentation, results, presentation, and demo handover  
-
----
-
-##  Suggested Project Structure  
-```bash
-ai-tracefinder/
-├─ app.py              
-├─ src/
-│  ├─ ingest/           
-│  ├─ preprocess/        
-│  ├─ features/          
-│  ├─ models/            
-│  ├─ explain/           
-│  └─ utils/             
-├─ data/                 
-├─ notebooks/            
-├─ reports/              
-└─ README.md
 ```
+@article{Korus2016TIFS,
+  Author = {P. Korus and J. Huang},
+  Journal = {IEEE Trans. on Information Forensics \& Security},
+  Title = {Multi-scale Analysis Strategies in PRNU-based Tampering Localization},
+  Year = {2017}
+}
+```
+
+The dataset can be easily used in conjunction with our multi-scale analysis toolbox. You can obtain a copy as follows:
+
+```
+# git clone https://github.com/pkorus/multiscale-prnu
+```
+
+Once you have cloned the repository, you can easily download this dataset using:
+
+```
+# ./configure.py data:maps
+```
+
+Example use of these maps can be found in the `demo_fusion` script. A simple benchmark is also available (`demo_benchmark` script). For more information, please refer to the documentation of the toolbox and the above-mentioned paper.
